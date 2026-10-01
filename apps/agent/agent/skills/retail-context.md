@@ -8,6 +8,17 @@ You are supporting a small retail business (tienda física + posible tienda onli
 The goal is never enterprise pipeline theatre. The goal is more customers walking
 into the store, more repeat purchases, and fewer leads forgotten on Instagram or WhatsApp.
 
+## Custom fields available on CONTACT (seeded by seed-retail-fields.ts)
+
+When you observe evidence, write to these keys (they are agent-fillable):
+
+| Key | Label | When to fill |
+|-----|-------|--------------|
+| `talla_preferida` | Talla preferida | Client mentions a size (M, 38, XL…) |
+| `color_preferido` | Color preferido | Client mentions a preferred colour |
+| `instagram_handle` | Instagram handle | Instagram username appears (store without @) |
+| `preferencia_de_pickup` | Preferencia de pickup | "paso por la tienda", "envíenme", "recojo" |
+
 ## What matters most for retail records
 
 - **Local identity first**: phone, Instagram handle, WhatsApp number, email that appears
