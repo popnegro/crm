@@ -4,7 +4,7 @@ This branch adapts Comp AI CRM for **pequeños comercios minoristas** (physical 
 
 ## What was added
 
-### New skill: `apps/agent/agent/skills/retail-context.md`
+### 1. New skill: `apps/agent/agent/skills/retail-context.md`
 
 The agent now has specialised guidance for retail contacts:
 
@@ -17,20 +17,44 @@ The agent now has specialised guidance for retail contacts:
 The skill does **not** change the evidence model. It only specialises how the agent
 chooses what to look for and how it phrases notes and rechecks.
 
+### 2. Retail custom fields for CONTACT
+
+Script: `packages/db/prisma/seed-retail-fields.ts`
+
+| Key | Label | Type | Options / Notes |
+|-----|-------|------|-----------------|
+| `talla_preferida` | Talla preferida | SELECT | XS, S, M, L, XL, XXL, 36–44, Única |
+| `color_preferido` | Color preferido | TEXT | Free text (e.g. azul, negro, beige) |
+| `instagram_handle` | Instagram handle | TEXT | Without @ |
+| `preferencia_de_pickup` | Preferencia de pickup | SELECT | Tienda física, Envío a domicilio, Ambos, Sin preferencia |
+
+All fields are:
+- `agentFilled: true` → the agent can write them when it sees evidence
+- Visible on the contact sheet, table and filters
+
+**How to seed them** (on a running database):
+
+```sh
+bun run --filter=@crm/db exec tsx prisma/seed-retail-fields.ts
+```
+
+The script is idempotent: you can run it multiple times safely.
+
 ## How to use it
 
 1. Deploy or run this branch as usual (`bun run dev` after setting `.env`).
-2. The skill is loaded automatically with the other skills in `apps/agent/agent/skills/`.
-3. When the workspace is a retail business, set a clear **Workspace profile**
+2. Run the retail fields seed (command above).
+3. The skill is loaded automatically with the other skills in `apps/agent/agent/skills/`.
+4. When the workspace is a retail business, set a clear **Workspace profile**
    (Settings → General or via the agent) describing the store type, location and
    main channels (Instagram / WhatsApp / tienda física). The agent already reads
    the workspace identity in every preamble.
 
 ## Next recommended adaptations (future commits on this branch)
 
-- Custom fields seed for retail: `preferred_size`, `preferred_colour`, `last_product_interest`, `pickup_preference`, `instagram_handle`.
 - Retail-specific task kinds or higher priority for Instagram/WhatsApp originated contacts.
 - Example agent prompts / builder templates for "seguimiento de leads de Instagram" and "recordatorio de stock para clientes que preguntaron".
+- Optional: seed a couple of demo contacts with these fields filled for the sales pitch.
 
 ## Commercial framing (for the marketing offer)
 
