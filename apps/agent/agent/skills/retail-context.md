@@ -14,10 +14,21 @@ When you observe evidence, write to these keys (they are agent-fillable):
 
 | Key | Label | When to fill |
 |-----|-------|--------------|
-| `talla_preferida` | Talla preferida | Client mentions a size (M, 38, XL…) |
-| `color_preferido` | Color preferido | Client mentions a preferred colour |
+| `talla_preferida` | Talla preferida | Client mentions a size (M, 38, XL…) or repeats it in orders |
+| `color_preferido` | Color preferido | Client mentions a preferred colour or buys it repeatedly |
 | `instagram_handle` | Instagram handle | Instagram username appears (store without @) |
 | `preferencia_de_pickup` | Preferencia de pickup | "paso por la tienda", "envíenme", "recojo" |
+
+## WooCommerce / online orders
+
+When a WooCommerce connection is present (see `docs/woocommerce-connection.md`):
+
+- Treat an online order as a high-signal event for that contact.
+- Prefer matching by email. Never invent a contact from a weak name match.
+- Use line-item attributes (size, colour) as supporting evidence for the retail fields above.
+- When an order is ready for pickup or recently delivered, propose a short, concrete
+  follow-up the store owner can do the same day.
+- Do not assume you can write back to WooCommerce (stock, prices, status). v1 is read-only.
 
 ## What matters most for retail records
 
@@ -26,7 +37,7 @@ When you observe evidence, write to these keys (they are agent-fillable):
 - **Product preferences**: sizes, colours, favourite categories, last items asked about,
   preferred brands. These are high-value facts for a small retailer.
 - **Channel of origin**: Instagram DM, WhatsApp, Google Business message, walk-in, or
-  online cart. Always record the channel when observed.
+  online cart / WooCommerce order. Always record the channel when observed.
 - **Pickup vs delivery**: if the customer mentions "paso por la tienda", "recojo", or
   a delivery address, capture it as a fact. It changes the follow-up cadence.
 - **Frequency signals**: "siempre compro aquí", "la última vez compré...", "para mi
@@ -38,11 +49,12 @@ Prefer these kinds when they appear:
 
 - `crm.signature-block` or `crm.thread-reply` from WhatsApp / Instagram / email
 - Any explicit product mention in a message (size, colour, SKU, collection)
+- Order line items and product attributes from WooCommerce (when connected)
 - Google Business or Instagram profile that matches the phone/email already on the record
 - Calendar or note that mentions a store visit or pickup time
 
 Never invent stock levels, prices or promotions. Only record what was observed in a
-message, signature, meeting or public profile already linked to the contact.
+message, signature, meeting, order or public profile already linked to the contact.
 
 ## Follow-up behaviour that helps a physical store
 
@@ -50,6 +62,7 @@ When you schedule a recheck or propose a next action:
 
 - Prefer short, concrete reasons a human can act on the same day:
   "Cliente preguntó talla M del vestido azul el 12/09 — recordar stock o alternativa"
+  "Pedido #4521 listo para recogida — avisar por WhatsApp"
   "Pidió recogida en tienda el viernes — confirmar si llegó el pedido"
 - Avoid generic "nurture" language. Retail owners respond to "está esperando respuesta"
   or "quiere pasar mañana".
@@ -67,7 +80,8 @@ When you schedule a recheck or propose a next action:
 
 When writing a brief or note for the human:
 
-- Lead with the last concrete interaction and the open question ("preguntó por X").
+- Lead with the last concrete interaction and the open question ("preguntó por X" or
+  "pedido #… en estado …").
 - Mention preferred channel if known (WhatsApp / Instagram / teléfono).
 - End with one suggested next action that can be done in under two minutes
   (reply, prepare stock, send payment link, mark for pickup).
