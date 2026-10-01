@@ -13,9 +13,7 @@ The agent now has specialised guidance for retail contacts:
 - Records channel of origin (Instagram DM, WhatsApp, walk-in, online)
 - Writes short, actionable follow-ups that a store owner can execute the same day
 - De-prioritises enterprise firmographics that do not help a tienda física
-
-The skill does **not** change the evidence model. It only specialises how the agent
-chooses what to look for and how it phrases notes and rechecks.
+- Is aware of online orders when a WooCommerce connection exists
 
 ### 2. Retail custom fields for CONTACT
 
@@ -28,42 +26,46 @@ Script: `packages/db/prisma/seed-retail-fields.ts`
 | `instagram_handle` | Instagram handle | TEXT | Without @ |
 | `preferencia_de_pickup` | Preferencia de pickup | SELECT | Tienda física, Envío a domicilio, Ambos, Sin preferencia |
 
-All fields are:
-- `agentFilled: true` → the agent can write them when it sees evidence
-- Visible on the contact sheet, table and filters
-
-**How to seed them** (on a running database):
+All fields are agent-fillable and visible on sheet, table and filters.
 
 ```sh
 bun run --filter=@crm/db exec tsx prisma/seed-retail-fields.ts
 ```
 
-The script is idempotent: you can run it multiple times safely.
+### 3. WooCommerce / WordPress connection (design)
 
-## How to use it
+Full design: [`docs/woocommerce-connection.md`](./woocommerce-connection.md)
 
-1. Deploy or run this branch as usual (`bun run dev` after setting `.env`).
-2. Run the retail fields seed (command above).
-3. The skill is loaded automatically with the other skills in `apps/agent/agent/skills/`.
-4. When the workspace is a retail business, set a clear **Workspace profile**
-   (Settings → General or via the agent) describing the store type, location and
-   main channels (Instagram / WhatsApp / tienda física). The agent already reads
-   the workspace identity in every preamble.
+Summary:
 
-## Next recommended adaptations (future commits on this branch)
+- **Brings in**: customers, orders, products (read-only v1)
+- **Sends**: nothing by default (safe)
+- Match key: email
+- Orders become activities the agent can brief and follow up
+- Product attributes feed `talla_preferida` / `color_preferido`
 
-- Retail-specific task kinds or higher priority for Instagram/WhatsApp originated contacts.
-- Example agent prompts / builder templates for "seguimiento de leads de Instagram" and "recordatorio de stock para clientes que preguntaron".
-- Optional: seed a couple of demo contacts with these fields filled for the sales pitch.
+Implementation of the live connection (credentials UI, webhooks, agent tools) is the next engineering step; the design and retail skill are ready so the commercial offer is consistent.
 
-## Commercial framing (for the marketing offer)
+## How to use it today
 
-This branch powers the offer:
+1. Deploy or run this branch (`bun run dev` after `.env`).
+2. Run the retail fields seed.
+3. Set a clear Workspace profile (store type, location, Instagram / WhatsApp / tienda física).
+4. When WooCommerce connection is implemented, connect with Consumer Key/Secret and enable order webhooks.
 
-**"Agente IA + Tienda Online que vende sola"** for small physical retailers.
+## Next recommended engineering steps
 
-Problem it solves: leads from Instagram/WhatsApp are forgotten; the store owner loses
-sales and spends hours on manual follow-up.
+1. Register `woocommerce` in the connections catalogue.
+2. Credential form + webhook intake.
+3. Agent tools `read_woocommerce_orders` / `read_woocommerce_customer`.
+4. Agent templates: “seguimiento pedido listo para recogida”, “cliente repite talla M”.
 
-ROI target: 2.3–3.4× return in the first 90 days through recovered leads + online orders
-+ in-store pickups.
+## Commercial framing
+
+**“Agente IA + Tienda Online que vende sola”**
+
+- Leads from Instagram/WhatsApp → CRM
+- Orders from WooCommerce → same CRM
+- Agent unifies both and does the follow-up
+
+ROI target: 2.3–3.4× in the first 90 days.
